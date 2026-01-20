@@ -9,7 +9,7 @@ from minio import Minio
 
 # === КОНФИГУРАЦИЯ (взята из project_parsed.txt) ===
 REDIS_URL = "redis://:unified_media_redis_password@localhost:6379/0"
-MINIO_ENDPOINT = "localhost:9000"
+MINIO_ENDPOINT = "minio-server:9000"
 MINIO_ACCESS_KEY = "minioadmin"
 MINIO_SECRET_KEY = "minioadmin"
 INPUT_BUCKET = "raw-videos"
