@@ -1,0 +1,31 @@
+insaf@DESKTOP-BR3JD4U:~/unified-media-processing/media_workers/v2-kursach-media-workers$ docker build -t unified-media-worker   --build-arg HTTP_PROXY="http://user158636:zbpy4j@88.209.192.67:9540/"   --build-arg HTTPS_PROXY="http://user158636:zbpy4j@88.209.192.67:9540/"   .
+[+] Building 8.5s (18/18) FINISHED                                                                                                                           docker:default
+ => [internal] load build definition from Dockerfile                                                                                                                   0.0s
+ => => transferring dockerfile: 2.02kB                                                                                                                                 0.0s
+ => [internal] load metadata for docker.io/library/python:3.11-alpine                                                                                                  7.9s
+ => [internal] load .dockerignore                                                                                                                                      0.0s
+ => => transferring context: 2B                                                                                                                                        0.0s
+ => [internal] load build context                                                                                                                                      0.0s
+ => => transferring context: 4.09kB                                                                                                                                    0.0s
+ => [builder 1/6] FROM docker.io/library/python:3.11-alpine@sha256:c825a02ff096b3dc3d362015f9e9f6527f66b73e11f9ad2db1f0da4e09ba7030                                    0.0s
+ => => resolve docker.io/library/python:3.11-alpine@sha256:c825a02ff096b3dc3d362015f9e9f6527f66b73e11f9ad2db1f0da4e09ba7030                                            0.0s
+ => CACHED [stage-1 2/8] RUN apk add --no-cache     ffmpeg     ca-certificates     curl                                                                                0.0s
+ => CACHED [stage-1 3/8] RUN addgroup -S appgroup && adduser -S appuser -G appgroup                                                                                    0.0s
+ => CACHED [stage-1 4/8] WORKDIR /app                                                                                                                                  0.0s
+ => CACHED [builder 2/6] RUN apk add --no-cache gcc musl-dev libffi-dev                                                                                                0.0s
+ => CACHED [builder 3/6] RUN echo "🔍 Checking external IP via proxy..." &&     apk add --no-cache curl &&     curl -s https://ipinfo.io/ip &&     echo "" &&     e     0.0s
+ => CACHED [builder 4/6] WORKDIR /app                                                                                                                                  0.0s
+ => CACHED [builder 5/6] COPY requirements.txt .                                                                                                                       0.0s
+ => CACHED [builder 6/6] RUN pip install --no-cache-dir -r requirements.txt                                                                                            0.0s
+ => CACHED [stage-1 5/8] COPY --from=builder --chown=appuser:appgroup /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages                  0.0s
+ => CACHED [stage-1 6/8] COPY --from=builder --chown=appuser:appgroup /usr/local/bin /usr/local/bin                                                                    0.0s
+ => [stage-1 7/8] COPY --chown=appuser:appgroup . .                                                                                                                    0.0s
+ => [stage-1 8/8] RUN mkdir -p /tmp && chown -R appuser:appgroup /tmp                                                                                                  0.2s
+ => exporting to image                                                                                                                                                 0.2s
+ => => exporting layers                                                                                                                                                0.1s
+ => => exporting manifest sha256:eca2c5ecc0c4053ea19fb66194bf25ef865acd5a55d8fccb0697fd5a72aaa378                                                                      0.0s
+ => => exporting config sha256:faa51f39da4944a6358c8b9a7115517ee124ba7d4f853d56301a50eb2d65838a                                                                        0.0s
+ => => exporting attestation manifest sha256:4cc44fc26a6ab45f9fe977287edd9fb1447a03bc1c7342391093295881f318f6                                                          0.0s
+ => => exporting manifest list sha256:9aba176b9f3dad6953c31928c9f808898bc287102c80a6c00af74323fe592d99                                                                 0.0s
+ => => naming to docker.io/library/unified-media-worker:latest                                                                                                         0.0s
+ => => unpacking to docker.io/library/unified-media-worker:latest

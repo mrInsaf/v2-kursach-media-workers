@@ -1,0 +1,59 @@
+FROM python:3.11-alpine AS builder
+
+# Установка зависимостей для сборки Python-пакетов
+RUN apk add --no-cache gcc musl-dev libffi-dev
+
+# Настройка прокси
+ARG HTTP_PROXY
+ARG HTTPS_PROXY
+ENV HTTP_PROXY=${HTTP_PROXY}
+ENV HTTPS_PROXY=${HTTPS_PROXY}
+
+# === ПРОВЕРКА ПРОКСИ ===
+RUN echo "🔍 Checking external IP via proxy..." && \
+    apk add --no-cache curl && \
+    curl -s https://ipinfo.io/ip && \
+    echo "" && \
+    echo "✅ Proxy appears to be working."
+
+# Создание рабочей директории
+WORKDIR /app
+
+# Копирование зависимостей и установка
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Сборка финального образа
+FROM python:3.11-alpine
+
+# Установка runtime зависимостей (FFmpeg и необходимые библиотеки)
+RUN apk add --no-cache \
+    ffmpeg \
+    ca-certificates \
+    curl
+
+# Настройка прокси для runtime
+ARG HTTP_PROXY
+ARG HTTPS_PROXY
+ENV HTTP_PROXY=${HTTP_PROXY}
+ENV HTTPS_PROXY=${HTTPS_PROXY}
+
+# Создание пользователя и рабочей директории
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+WORKDIR /app
+
+# Копирование установленных зависимостей из builder этапа
+COPY --from=builder --chown=appuser:appgroup /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=builder --chown=appuser:appgroup /usr/local/bin /usr/local/bin
+
+# Копирование приложения
+COPY --chown=appuser:appgroup . .
+
+# Создание директорий для временных файлов
+RUN mkdir -p /tmp && chown -R appuser:appgroup /tmp
+
+# Переключение на непривилегированного пользователя
+USER appuser
+
+# Запуск воркера
+CMD ["python", "media_workers.py"]

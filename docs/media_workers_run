@@ -1,0 +1,26 @@
+docker run -d \
+  --name media-worker \
+  --network media-net \
+  -e REDIS_URL="redis://:unified_media_redis_password@redis-server:6379/0" \
+  -e MINIO_ENDPOINT="minio-server:9000" \
+  -e MINIO_ACCESS_KEY="minioadmin" \
+  -e MINIO_SECRET_KEY="minioadmin" \
+  unified-media-worker
+
+
+insaf@DESKTOP-BR3JD4U:~/unified-media-processing/media_workers/v2-kursach-media-workers$ docker run -d \
+  --name media-worker \
+  --network media-net \
+  -e REDIS_URL="redis://:unified_media_redis_password@redis-server:6379/0" \
+  -e MINIO_ENDPOINT="minio-server:9000" \
+  -e MINIO_ACCESS_KEY="minioadmin" \
+  -e MINIO_SECRET_KEY="minioadmin" \
+  unified-media-worker
+a1b2c3d4e5f67890a1b2c3d4e5f67890a1b2c3d4e5f67890a1b2c3d4e5f67890
+
+insaf@DESKTOP-BR3JD4U:~/unified-media-processing/media_workers/v2-kursach-media-workers$ docker logs media-worker
+INFO:media-worker:Media Worker запущен. Ожидание задач из очереди 'media_tasks:queue'...
+INFO:media-worker:Обработка задачи 8f3a1c2d-4e5b-6f7c-8d9e-0a1b2c3d4e5f, файл: raw-videos/sample_video.mp4
+INFO:media-worker:Запуск FFmpeg: ffmpeg -y -i /tmp/sample_video.mp4 -c:v libx264 -preset fast -crf 23 -c:a aac -b:a 128k /tmp/processed_sample_video.mp4
+INFO:media-worker:Результат сохранён: processed-videos/processed_sample_video.mp4
+INFO:media-worker:Успешно обработана задача 8f3a1c2d-4e5b-6f7c-8d9e-0a1b2c3d4e5f
