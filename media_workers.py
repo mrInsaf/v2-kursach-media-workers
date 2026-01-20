@@ -5,15 +5,15 @@ import subprocess
 import time
 
 import redis
-from minio import Minio
+from minio import Minio, S3Error
 
-# === КОНФИГУРАЦИЯ (взята из project_parsed.txt) ===
-REDIS_URL = "redis://:unified_media_redis_password@redis-server:6379/0"
-MINIO_ENDPOINT = "minio-server:9000"
-MINIO_ACCESS_KEY = "minioadmin"
-MINIO_SECRET_KEY = "minioadmin"
-INPUT_BUCKET = "raw-videos"
-OUTPUT_BUCKET = "processed-videos"
+# === КОНФИГУРАЦИЯ ИЗ ПЕРЕМЕННЫХ ОКРУЖЕНИЯ ===
+REDIS_URL = os.getenv("REDIS_URL", "redis://:unified_media_redis_password@redis-server:6379/0")
+MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT", "minio-server:9000")
+MINIO_ACCESS_KEY = os.getenv("MINIO_ACCESS_KEY", "minioadmin")
+MINIO_SECRET_KEY = os.getenv("MINIO_SECRET_KEY", "minioadmin")
+INPUT_BUCKET = os.getenv("INPUT_BUCKET", "raw-videos")
+OUTPUT_BUCKET = os.getenv("OUTPUT_BUCKET", "processed-videos")
 
 # Настройка логов
 logging.basicConfig(level=logging.INFO)
@@ -30,9 +30,18 @@ minio_client = Minio(
     secure=False
 )
 
-# Создаём бакет для результатов, если не существует
-if not minio_client.bucket_exists(OUTPUT_BUCKET):
-    minio_client.make_bucket(OUTPUT_BUCKET)
+# Создаём бакет для результатов с обработкой ошибки
+try:
+    if not minio_client.bucket_exists(OUTPUT_BUCKET):
+        minio_client.make_bucket(OUTPUT_BUCKET)
+        logger.info(f"Bucket '{OUTPUT_BUCKET}' создан.")
+    else:
+        logger.info(f"Bucket '{OUTPUT_BUCKET}' уже существует.")
+except S3Error as e:
+    if e.code == "BucketAlreadyOwnedByYou":
+        logger.info(f"Bucket '{OUTPUT_BUCKET}' уже существует и принадлежит вам.")
+    else:
+        raise
 
 
 def process_task(task):
